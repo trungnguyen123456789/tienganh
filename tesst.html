@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduVerse - Lò Luyện Tiếng Anh AI</title>
+
+    <style>
+        /* CHẾ ĐỘ TỐI (DARK MODE - MẶC ĐỊNH) */
+        :root {
+            --bg-color: #0b0c10; 
+            --panel-bg: #1f2833; 
+            --primary: #2980b9;
+            --accent: #00cec9; 
+            --gold: #ffd700; 
+            --text-main: #dfdfe2;
+            --text-paper: #0b0c10; 
+            --paper-bg: #fdfbf7;
+            --border-color: rgba(0, 206, 201, 0.3);
+            --shadow-color: rgba(0, 206, 201, 0.2);
+            --box-bg: rgba(0,0,0,0.4);
+            --modal-bg: rgba(11, 12, 16, 0.95);
+        }
+
+        /* CHẾ ĐỘ SÁNG (LIGHT MODE) */
+        body.light-mode {
+            --bg-color: #f5f6fa; 
+            --panel-bg: #ffffff; 
+            --primary: #0984e3;
+            --accent: #d63031; 
+            --gold: #e67e22; 
+            --text-main: #2d3436;
+            --text-paper: #2d3436; 
+            --paper-bg: #ffffff;
+            --border-color: rgba(0, 0, 0, 0.15);
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --box-bg: #f1f2f6;
+            --modal-bg: rgba(255, 255, 255, 0.95);
+        }
+
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden; transition: 0.4s ease; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(0, 206, 201, 0.3); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+        header { background-color: var(--panel-bg); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px var(--shadow-color); z-index: 10; border-bottom: 1px solid var(--border-color); transition: 0.4s ease; }
+        .logo { font-size: 26px; font-weight: 900; color: var(--text-main); letter-spacing: 3px; text-decoration: none;}
+        .logo span { color: var(--accent); }
+        .top-menu { display: flex; align-items: center; gap: 15px; }
+        .theme-btn { background-color: var(--box-bg); color: var(--text-main); border: 1px solid var(--border-color); padding: 8px 15px; border-radius: 20px; cursor: pointer; font-weight: bold; transition: 0.3s; font-size: 14px; }
+        .theme-btn:hover { background-color: var(--primary); color: white; }
+        .gold-display { background-color: rgba(255, 215, 0, 0.1); padding: 8px 20px; border-radius: 25px; color: var(--gold); font-weight: bold; font-size: 16px; border: 1px solid var(--gold); }
+        .shop-btn { background-color: transparent; color: var(--accent); border: 2px solid var(--accent); padding: 8px 20px; border-radius: 25px; cursor: pointer; font-weight: bold; font-size: 14px; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px; }
+        .shop-btn:hover { background-color: var(--accent); color: #fff; }
+        .user-profile { font-weight: bold; display: flex; align-items: center; gap: 10px; color: var(--text-main); }
+        .avatar-circle { width: 40px; height: 40px; background-color: var(--box-bg); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 20px; border: 2px solid var(--primary); }
+
+        .view-section { flex: 1; display: none; flex-direction: column; width: 100%; height: 100%; min-height: 0; }
+        .active-view { display: flex; }
+
+        #mainMenu { align-items: center; justify-content: center; padding: 20px; overflow-y: auto;}
+        .mode-container { background-color: var(--panel-bg); padding: 50px; border-radius: 15px; text-align: center; max-width: 650px; width: 100%; box-shadow: 0 15px 40px var(--shadow-color); border: 1px solid var(--border-color); transition: 0.4s ease; }
+        .mode-btn { background-color: var(--bg-color); color: var(--text-main); border: 1px solid var(--primary); padding: 20px 20px; border-radius: 8px; width: 100%; font-size: 18px; font-weight: bold; margin-bottom: 20px; cursor: pointer; transition: 0.4s; text-transform: uppercase; letter-spacing: 1px; display: block; text-decoration: none; }
+        .mode-btn:hover { background-color: var(--primary); color: white; transform: translateY(-3px); box-shadow: 0 10px 20px var(--shadow-color); border-color: var(--accent);}
+        .ai-btn { border-color: var(--gold); color: var(--gold); }
+        .ai-btn:hover { background-color: var(--gold); color: white; }
+        .flashcard-btn { border-color: #2ecc71; color: #2ecc71; }
+        .flashcard-btn:hover { background-color: #2ecc71; color: white; }
+
+        .workspace { display: flex; flex: 1; padding: 20px; gap: 20px; overflow: hidden; min-height: 0; background-color: var(--bg-color); transition: 0.4s ease;}
+        .exam-paper { flex: 1.4; background-color: var(--paper-bg); color: var(--text-paper); padding: 40px; border-radius: 8px; overflow-y: auto; box-shadow: inset 0 0 20px rgba(0,0,0,0.05); font-size: 16px; line-height: 1.6; font-family: 'Times New Roman', Times, serif; text-align: justify; border: 1px solid var(--border-color); }
+        .exam-header { text-align: center; font-weight: bold; margin-bottom: 20px; border-bottom: 2px solid #333; padding-bottom: 10px; font-size: 18px;}
+        .loading-overlay { display: none; text-align: center; padding: 50px; background-color: var(--bg-color); color: var(--accent); font-family: 'Segoe UI', sans-serif;}
+        
+        .answer-sheet { flex: 0.8; display: flex; flex-direction: column; background-color: var(--panel-bg); border-radius: 8px; overflow-y: auto; overflow-x: hidden; border: 1px solid var(--border-color); transition: 0.4s ease; position: relative; }
+        #answerFormArea { padding: 20px; display: flex; flex-direction: column; flex: 1; }
+        .mcq-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .mcq-item { background: var(--box-bg); padding: 10px; border-radius: 6px; border: 1px solid var(--border-color); display: flex; flex-direction: column; align-items: center; }
+        .mcq-item span { font-weight: bold; color: var(--accent); margin-bottom: 8px; font-size: 14px;}
+        .mcq-options { display: flex; gap: 8px; justify-content: center; width: 100%;}
+        .mcq-options label { display: flex; justify-content: center; align-items: center; width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--text-main); cursor: pointer; transition: 0.2s; font-size: 13px; font-weight: bold; }
+        .mcq-options input[type="radio"] { display: none; }
+        .mcq-options input[type="radio"]:checked + span { background-color: var(--primary); color: white; border-color: var(--primary); width: 100%; height: 100%; border-radius: 50%; display: flex; justify-content: center; align-items: center; }
+        .mcq-options span { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; border-radius: 50%; }
+
+        .submit-btn { background: linear-gradient(135deg, var(--gold), #e6a800); color: #fff; border: none; padding: 18px; font-size: 16px; font-weight: bold; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; width: 100%; position: sticky; bottom: 0; z-index: 10; box-shadow: 0 -5px 20px rgba(0,0,0,0.4); border-radius: 0 0 8px 8px; margin-top: auto; }
+        .submit-btn:hover { background: linear-gradient(135deg, #ffd700, #ffc107); padding-bottom: 20px;}
+
+        .workspace-bar { background-color: var(--panel-bg); padding: 12px 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); box-shadow: 0 4px 15px var(--shadow-color); transition: 0.4s ease; z-index: 5; }
+        .workspace-bar button { background-color: transparent; color: var(--text-main); border: 1px solid var(--text-main); padding: 6px 15px; border-radius: 5px; cursor: pointer; transition: 0.3s; font-size: 14px; }
+        .workspace-bar button:hover { background-color: var(--text-main); color: var(--panel-bg);}
+
+        #aiGradingOverlay { display: none; flex-direction: column; justify-content: center; align-items: center; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--modal-bg); z-index: 50; border-radius: 8px; text-align: center; }
+        .ai-pulse { width: 80px; height: 80px; background-color: var(--accent); border-radius: 50%; animation: pulse 1.5s infinite; margin-bottom: 20px; }
+        @keyframes pulse { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 206, 201, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 20px rgba(0, 206, 201, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 206, 201, 0); } }
+        
+        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); backdrop-filter: blur(5px); justify-content: center; align-items: center; }
+        .modal-content { background-color: var(--panel-bg); width: 850px; max-width: 95%; border-radius: 10px; padding: 40px; position: relative; border: 1px solid var(--border-color); max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.5); transition: 0.4s ease; }
+        .close-btn { position: absolute; top: 15px; right: 20px; color: var(--text-main); font-size: 28px; cursor: pointer; transition: 0.3s;}
+        .close-btn:hover { color: var(--accent); }
+        .shop-items { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 20px; }
+        .item-card { background-color: var(--box-bg); padding: 20px; border-radius: 10px; text-align: center; border: 1px solid var(--border-color); transition: 0.3s;}
+        .item-card:hover { border-color: var(--accent); transform: translateY(-5px); box-shadow: 0 10px 20px var(--shadow-color);}
+        .buy-btn { background-color: var(--gold); color: #fff; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; width: 100%; font-weight:bold; margin-top:15px; text-transform: uppercase; }
+
+        .score-board { text-align: center; }
+        .score-circle { width: 160px; height: 160px; border-radius: 50%; border: 6px solid var(--accent); display: flex; justify-content: center; align-items: center; font-size: 45px; font-weight: bold; margin: 0 auto 30px auto; color: var(--accent); box-shadow: 0 0 20px var(--shadow-color); text-align: center; }
+        .score-details { text-align: left; background: var(--box-bg); padding: 25px; border-radius: 8px; margin-bottom: 25px; border: 1px solid var(--border-color);}
+        .score-row { display: flex; justify-content: space-between; border-bottom: 1px dashed var(--border-color); padding: 12px 0; font-size: 16px;}
+        .solution-box { background: var(--box-bg); padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid var(--accent); text-align: left; line-height: 1.6; font-size: 15px;}
+        
+        .exam-passage { background-color: rgba(0,0,0,0.03); padding: 20px; border-left: 5px solid #555; margin-bottom: 20px; border-radius: 4px; }
+        .exam-question-list { padding-left: 0; margin-top: 5px; margin-bottom: 20px;}
+        .exam-question-list li { margin-bottom: 15px; }
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 5px; padding-left: 20px;}
+        .options-grid.full-width { grid-template-columns: 1fr; }
+
+        @media (max-width: 768px) {
+            header { flex-direction: column; padding: 15px; gap: 15px; }
+            .top-menu { flex-wrap: wrap; justify-content: center; gap: 10px; }
+            .workspace { display: block; overflow-y: auto; padding: 10px; }
+            .exam-paper { width: 100%; margin-bottom: 15px; padding: 20px 15px; font-size: 16px; overflow-y: visible; max-height: none; }
+            .answer-sheet { width: 100%; overflow-y: visible; }
+            .submit-btn { position: static; border-radius: 8px; }
+            .options-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="#" class="logo" onclick="goBackToMainMenu()">EDUVERSE <span>ENGLISH</span></a>
+        <div class="top-menu">
+            <button class="theme-btn" onclick="toggleTheme()">🌓 Giao Diện</button>
+            <div class="gold-display"><span id="gold">2500</span> 🪙</div>
+            <button class="shop-btn" onclick="openShop()">Cửa Hàng</button>
+            <div class="user-profile"><div class="avatar-circle">🇬🇧</div>Master</div>
+        </div>
+    </header>
+
+    <div id="mainMenu" class="view-section active-view">
+        <div class="mode-container">
+            <div style="font-size: 70px; margin-bottom: 20px;">🎓</div>
+            <h2 style="color: var(--accent); margin-bottom: 30px; font-size: 32px; letter-spacing: 2px; text-transform: uppercase;">Lò Luyện Tiếng Anh</h2>
+            <p style="margin-bottom: 40px; color: var(--text-main); font-size: 16px;">Full Đề THPTQG - Trắc Nghiệm Tự Động Chấm</p>
+            <button class="mode-btn" onclick="startOfficialExam()">📜 Làm Đề Chính Thức (Mã 1105 - Full 40 Câu)</button>
+            <button class="mode-btn ai-btn" onclick="generateAIExam()">✨ Sinh Đề Mới Bằng AI (Đang cập nhật)</button>
+            <a href="https://trungnguyen123456789.github.io/van/" target="_blank" class="mode-btn flashcard-btn">🎴 Học Từ Vựng Flashcard</a>
+        </div>
+    </div>
+
+    <div id="examWorkspace" class="view-section">
+        <div class="workspace-bar">
+            <div id="workspaceTitle" style="font-weight: bold; color: var(--accent); letter-spacing: 1px;">ĐANG TRONG: ĐẤU TRƯỜNG TIẾNG ANH</div>
+            <button onclick="goBackToMainMenu()">Thoát phòng thi</button>
+        </div>
+
+        <div class="workspace">
+            <div class="exam-paper" id="examContent"></div>
+            
+            <div class="exam-paper loading-overlay" id="loadingScreen">
+                <h2 style="font-family: 'Segoe UI'; margin-top: 50px; color: var(--accent); letter-spacing: 2px;">AI ĐANG TÁI TẠO ĐỀ...</h2>
+                <p style="color: var(--text-main);">Đang kết nối API Pollinations để clone cấu trúc và sinh đề mới...</p>
+                <div style="font-size: 60px; margin-top: 40px; animation: pulse 1s infinite;">⏳</div>
+            </div>
+
+            <div class="answer-sheet" id="answerSheetContainer">
+                <div id="aiGradingOverlay">
+                    <div class="ai-pulse"></div>
+                    <h3 style="color: var(--gold); margin-top: 20px;">Hệ Thống Đang Chấm Bài...</h3>
+                    <p style="color: var(--text-main); text-align: center; padding: 0 20px; font-style: italic; font-size: 14px;" id="aiStatusText">Đang tổng hợp đáp án và gọi AI nhận xét...</p>
+                </div>
+                <div id="answerFormArea">
+                    <h3 style="color: var(--accent); text-align: center; margin-top: 0; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px;">PHIẾU TÔ TRẮC NGHIỆM</h3>
+                    <div class="mcq-grid" id="mcqGridArea">
+                        </div>
+                </div>
+                <button class="submit-btn" id="submitBtnFixed" onclick="submitExam()">🤖 Nộp bài & Chấm Điểm</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="shopModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeShop()">&times;</span>
+            <h2 style="margin-top: 0; color: var(--accent);">Cửa Hàng Vật Phẩm</h2>
+            <div class="shop-items">
+                <div class="item-card"><div style="font-size: 50px; margin-bottom: 15px;">🖋️</div><div style="font-weight: bold; margin-bottom: 10px;">Bút Máy Oxford</div><button class="buy-btn" onclick="buyItem(800)">800 🪙</button></div>
+                <div class="item-card"><div style="font-size: 50px; margin-bottom: 15px;">🏆</div><div style="font-weight: bold; margin-bottom: 10px;">Danh hiệu: IELTS 8.0</div><button class="buy-btn" onclick="buyItem(1500)">1500 🪙</button></div>
+                <div class="item-card"><div style="font-size: 50px; margin-bottom: 15px;">🇬🇧</div><div style="font-weight: bold; margin-bottom: 10px;">Khung Cờ Anh</div><button class="buy-btn" onclick="buyItem(500)">500 🪙</button></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="scoreModal" class="modal">
+        <div class="modal-content" style="width: 750px;">
+            <div class="score-board">
+                <h2 style="color: var(--gold); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px;">BẢNG ĐIỂM KẾT QUẢ</h2>
+                <div class="score-circle" id="finalScoreDisplay">0.0</div>
+                
+                <div class="score-details">
+                    <div class="score-row"><span>Tổng số câu đúng:</span> <strong id="correctAnswersDisplay" style="color: var(--accent);">0 / 40</strong></div>
+                    <div class="score-row"><span>Điểm thang 10:</span> <strong id="engScore1" style="color: var(--accent);">0.0 / 10.0đ</strong></div>
+                    <div id="aiFeedbackArea"></div>
+                </div>
+
+                <div style="font-size: 20px; font-weight: bold; color: var(--gold); margin-bottom: 25px;">
+                    Thưởng: <span id="rewardGold">+0</span> 🪙
+                </div>
+
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <button class="buy-btn" style="flex: 1; padding: 15px; background-color: var(--primary);" onclick="showSolutions()">Xem Đáp Án Chi Tiết</button>
+                    <button class="buy-btn" style="flex: 1; padding: 15px; background-color: var(--panel-bg); color: var(--text-main); border: 1px solid var(--text-main);" onclick="closeScoreBoard()">Về Sảnh</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="solutionModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeSolutionBoard()">&times;</span>
+            <h2 style="margin-top: 0; color: var(--gold);">ANSWER KEY & GIẢI THÍCH CHI TIẾT</h2>
+            <div id="solutionContent" style="margin-top: 20px; font-size: 15px;"></div>
+        </div>
+    </div>
+
+    <script>
+        function toggleTheme() { document.body.classList.toggle('light-mode'); }
+        let currentGold = 2500;
+        const goldDisplay = document.getElementById('gold');
+
+        // STATE BÀI THI
+        let currentTotalQuestions = 40;
+        let activeAnswerKey = {}; 
+
+        // BẢNG ĐÁP ÁN CHUẨN ĐỀ THPTQG MÃ 1105
+        const thpt1105Key = {
+            q1: 'D', q2: 'B', q3: 'A', q4: 'D', q5: 'D', q6: 'A',
+            q7: 'C', q8: 'C', q9: 'D', q10: 'C', q11: 'B', q12: 'B', q13: 'A', q14: 'B',
+            q15: 'A', q16: 'C', q17: 'B', q18: 'C', q19: 'D',
+            q20: 'B', q21: 'B', q22: 'B', q23: 'A', q24: 'A', q25: 'B', q26: 'D', q27: 'C', q28: 'C', q29: 'C',
+            q30: 'C', q31: 'D', q32: 'B', q33: 'A', q34: 'B',
+            q35: 'D', q36: 'A', q37: 'D', q38: 'A', q39: 'D', q40: 'A'
+        };
+
+        function openShop() { document.getElementById('shopModal').style.display = 'flex'; }
+        function closeShop() { document.getElementById('shopModal').style.display = 'none'; }
+        function buyItem(price) { if (currentGold >= price) { currentGold -= price; goldDisplay.innerText = currentGold; alert("Giao dịch thành công!"); } else { alert("Không đủ vàng!"); } }
+        function closeScoreBoard() { document.getElementById('scoreModal').style.display = 'none'; goBackToMainMenu(); }
+        function showSolutions() { document.getElementById('scoreModal').style.display = 'none'; document.getElementById('solutionModal').style.display = 'flex'; }
+        function closeSolutionBoard() { document.getElementById('solutionModal').style.display = 'none'; goBackToMainMenu(); }
+
+        function goBackToMainMenu() { 
+            document.getElementById('mainMenu').classList.add('active-view'); 
+            document.getElementById('examWorkspace').classList.remove('active-view');
+        }
+
+        // TẠO LƯỚI MCQ ĐỘNG
+        function renderMCQGrid(numQuestions) {
+            let mcqHTML = '';
+            for (let i = 1; i <= numQuestions; i++) {
+                mcqHTML += `
+                <div class="mcq-item">
+                    <span>Câu ${i}</span>
+                    <div class="mcq-options">
+                        <label><input type="radio" name="q${i}" value="A"><span>A</span></label>
+                        <label><input type="radio" name="q${i}" value="B"><span>B</span></label>
+                        <label><input type="radio" name="q${i}" value="C"><span>C</span></label>
+                        <label><input type="radio" name="q${i}" value="D"><span>D</span></label>
+                    </div>
+                </div>`;
+            }
+            document.getElementById('mcqGridArea').innerHTML = mcqHTML;
+        }
+
+        // BẮT ĐẦU ĐỀ CỐ ĐỊNH 1105
+        function startOfficialExam() {
+            document.getElementById('mainMenu').classList.remove('active-view');
+            document.getElementById('examWorkspace').classList.add('active-view');
+            document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('examContent').style.display = 'block';
+            document.getElementById('answerSheetContainer').style.display = 'flex';
+            
+            currentTotalQuestions = 40;
+            activeAnswerKey = thpt1105Key;
+            renderMCQGrid(currentTotalQuestions);
+            
+            document.getElementById('examContent').innerHTML = getTHPTEnglishExamHTML();
+            document.getElementById('solutionContent').innerHTML = getTHPTEnglishAnswersHTML();
+        }
+
+        // BẮT ĐẦU ĐỀ AI GENERATED - TẠM THỜI ĐÓNG
+        function generateAIExam() {
+            alert("Tính năng Sinh Đề AI đang được bảo trì và cập nhật. Vui lòng sử dụng tính năng 'Làm Đề Chính Thức' hoặc quay lại sau nhé!");
+        }
+
+        // CHẤM ĐIỂM
+        async function submitExam() {
+            let overlay = document.getElementById('aiGradingOverlay');
+            overlay.style.display = 'flex';
+
+            let correctCount = 0;
+            let wrongQuestions = [];
+            
+            for (let i = 1; i <= currentTotalQuestions; i++) {
+                let selected = document.querySelector(`input[name="q${i}"]:checked`);
+                let userAns = selected ? selected.value : null;
+                if (userAns === activeAnswerKey[`q${i}`]) {
+                    correctCount++;
+                } else {
+                    wrongQuestions.push(`Câu ${i} (Chọn: ${userAns||"Trống"} - Đúng: ${activeAnswerKey[`q${i}`]||"N/A"})`);
+                }
+            }
+
+            let score = (correctCount / currentTotalQuestions) * 10;
+            let promptText = `Giáo viên Tiếng Anh ơi. Học sinh vừa làm test trắc nghiệm.
+Số câu đúng: ${correctCount}/${currentTotalQuestions}. Điểm: ${score.toFixed(2)}/10. 
+Các câu sai: ${wrongQuestions.slice(0, 5).join(', ')}.
+Hãy nhận xét ngắn gọn 1 câu khích lệ và 1 câu khuyên học sinh.
+Chỉ trả về JSON định dạng: {"comment": "..."}`;
+
+            try {
+                const res = await fetch("https://text.pollinations.ai/", {
+                    method: "POST", headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        messages: [{ role: "system", content: "You output valid JSON." }, { role: "user", content: promptText }],
+                        jsonMode: true
+                    })
+                });
+                
+                let aiResponse = await res.text();
+                let jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
+                let result = JSON.parse(jsonMatch ? jsonMatch[0] : '{"comment": "Bạn đã hoàn thành bài thi! Cố gắng phân tích kỹ đáp án sai ở phần Solution nhé!"}');
+
+                document.getElementById('finalScoreDisplay').innerText = score.toFixed(2);
+                document.getElementById('correctAnswersDisplay').innerText = `${correctCount} / ${currentTotalQuestions}`;
+                document.getElementById('engScore1').innerText = `${score.toFixed(2)} / 10.0đ`;
+                document.getElementById('aiFeedbackArea').innerHTML = `
+                    <div class="solution-box" style="margin-top: 15px; border-color: #2ecc71;">
+                        <h4 style="margin-top: 0; color: #2ecc71;">🤖 NHẬN XÉT TỪ AI</h4>
+                        <p style="font-size: 15px; font-style: italic;">"${result.comment || result.Comment}"</p>
+                        ${wrongQuestions.length > 0 ? `<p style="font-size: 13px; color: #e74c3c; margin-top: 10px;"><b>Xem lại các câu sau:</b> ${wrongQuestions.join('; ')}</p>` : ''}
+                    </div>`;
+
+                let reward = correctCount * 10;
+                currentGold += reward;
+                goldDisplay.innerText = currentGold;
+                document.getElementById('rewardGold').innerText = `+${reward}`;
+                
+                overlay.style.display = 'none';
+                document.getElementById('scoreModal').style.display = 'flex';
+
+            } catch (error) {
+                overlay.style.display = 'none';
+                document.getElementById('finalScoreDisplay').innerText = score.toFixed(2);
+                document.getElementById('correctAnswersDisplay').innerText = `${correctCount} / ${currentTotalQuestions}`;
+                document.getElementById('engScore1').innerText = `${score.toFixed(2)} / 10.0đ`;
+                document.getElementById('scoreModal').style.display = 'flex';
+            }
+        }
+
+        // TEXT HTML ĐỀ CHÍNH THỨC 1105
+        function getTHPTEnglishExamHTML() {
+            return `
+                <div class="exam-header">
+                    BỘ GIÁO DỤC VÀ ĐÀO TẠO - KỲ THI TỐT NGHIỆP THPT NĂM 2025<br>
+                    ĐỀ THI CHÍNH THỨC - Môn thi: TIẾNG ANH<br>
+                    <small>Mã đề: 1105 | Thời gian: 50 phút</small>
+                </div>
+                
+                <i><b>Read the following announcement and mark the letter A, B, C or D to indicate the option that best fits each of the numbered blanks from 1 to 6.</b></i>
+                <h4 style="text-align: center;">Vietnam International Art Exhibition 2025 – A Landmark Cultural Event</h4>
+                <div class="exam-passage">
+                    Taking place from July 25th to 29th at the International Centre for Exhibition in Hanoi, the Vietnam International Art Exhibition 2025 will showcase over 100 famous galleries <b>(1) _____</b> are derived from global art capitals alongside Vietnam's <b>(2) _____</b> art institutions.<br><br>
+                    Visitors will gain exposure to a wide <b>(3) _____</b> of oil paintings, sculptures, digital art, and mixed media, blending traditional and contemporary styles. The event will also feature live art demonstrations and insightful discussions <b>(4) _____</b> by famous artists and curators, offering a deeper understanding of modern artistic trends.<br><br>
+                    This exhibition is a unique opportunity for <b>(5) _____</b>, investors, and art enthusiasts to discover emerging talents and <b>(6) _____</b> some artworks. Don't miss this incredible celebration of artistic expression!
+                </div>
+                <ul class="exam-question-list" style="list-style-type: none;">
+                    <li><b>Question 1.</b> <div class="options-grid"><span>A. whose</span><span>B. whom</span><span>C. who</span><span>D. which</span></div></li>
+                    <li><b>Question 2.</b> <div class="options-grid"><span>A. flying</span><span>B. leading</span><span>C. heading</span><span>D. rating</span></div></li>
+                    <li><b>Question 3.</b> <div class="options-grid"><span>A. range</span><span>B. amount</span><span>C. deal</span><span>D. number</span></div></li>
+                    <li><b>Question 4.</b> <div class="options-grid"><span>A. holding</span><span>B. have held</span><span>C. be holding</span><span>D. held</span></div></li>
+                    <li><b>Question 5.</b> <div class="options-grid"><span>A. collectively</span><span>B. collective</span><span>C. collect</span><span>D. collectors</span></div></li>
+                    <li><b>Question 6.</b> <div class="options-grid"><span>A. pick up</span><span>B. fill up</span><span>C. come up</span><span>D. get up</span></div></li>
+                </ul>
+
+                <hr style="border: 0; border-top: 1px dashed var(--border-color); margin: 30px 0;">
+
+                <i><b>Read the passage and mark the letter A, B, C or D to indicate the best answer to each of the following questions from 7 to 14.</b></i>
+                <div class="exam-passage">
+                    The concept of project farming, where farmers come together to collaborate on large-scale agricultural projects, has gained significant traction, and modern technology keeps this collaboration on track. Advanced technologies such as GPS, sensors, drones, and data analytics are used to optimise agricultural practices. Additionally, the collected real-time data on soil conditions, weather patterns, and plant growth enables farmers to <b>accelerate</b> the decision-making process that maximises productivity while minimising resource wastage.<br><br>
+                    GPS technology allows farmers to precisely map out their fields and create customised planting plans. This ensures that seeds are sown at optimal locations based on soil characteristics and previous yield data. By avoiding areas with poor fertility, farmers can increase their overall crop yield. Camera traps provide advance warnings of insects, so farmers do not have to treat the whole field. This, therefore, helps <b>curb</b> chemical runoff and save money for every party involved in the project.<br><br>
+                    Technology also plays a vital role in optimising irrigation practices for sustainable agriculture. Specialised equipment reports dryness hour by hour, and weather apps forecast rain for the week ahead. Automated valves give each zone exactly the water <b>it</b> needs and pause when clouds are approaching. This cuts pumping costs and protects groundwater while keeping the crop healthy. <u>On dry continents, such savings keep projects economically viable.</u><br><br>
+                    The digital trail does not stop at the farm gate. Cloud platforms let project farmers, processors, and truck drivers input harvest weights, storage temperatures, and delivery times the moment they change, while blockchain records freeze each entry so customers can trust it. Analytic tools combine seasons of records to forecast demand, spot price opportunities, and mark weak points in the workflow. This allows project farmers to anticipate market demand, exploit resource allocation, and plan for potential challenges.
+                </div>
+                <ul class="exam-question-list" style="list-style-type: none;">
+                    <li><b>Question 7.</b> Which of the following is NOT mentioned in paragraph 1 as a type of collected real-time data?
+                        <div class="options-grid"><span>A. weather patterns</span><span>B. soil conditions</span><span>C. data analytics</span><span>D. plant growth</span></div>
+                    </li>
+                    <li><b>Question 8.</b> The word <b>accelerate</b> in paragraph 1 can be best replaced by ______.
+                        <div class="options-grid"><span>A. require</span><span>B. guide</span><span>C. speed</span><span>D. install</span></div>
+                    </li>
+                    <li><b>Question 9.</b> The word <b>curb</b> in paragraph 2 is OPPOSITE in meaning to ______.
+                        <div class="options-grid"><span>A. limit</span><span>B. reduce</span><span>C. monitor</span><span>D. increase</span></div>
+                    </li>
+                    <li><b>Question 10.</b> The word <b>it</b> in paragraph 3 refers to ______.
+                        <div class="options-grid"><span>A. dryness</span><span>B. equipment</span><span>C. zone</span><span>D. week</span></div>
+                    </li>
+                    <li><b>Question 11.</b> Which of the following best paraphrases the underlined sentence in paragraph 3?
+                        <div class="options-grid full-width">
+                            <span>A. In places with hot weather, economic projects are possible with money saved.</span>
+                            <span>B. Money saved thanks to smart irrigation maintains the economic practicality of projects in dry areas.</span>
+                            <span>C. Continents with dry climate are the most likely to enjoy financial benefits.</span>
+                            <span>D. Projects in dry regions are feasible because of the huge budget gained.</span>
+                        </div>
+                    </li>
+                    <li><b>Question 12.</b> Which of the following is TRUE according to paragraph 4?
+                        <div class="options-grid full-width">
+                            <span>A. Customers tend to find the entries frozen by blockchain untrustworthy.</span>
+                            <span>B. With the help of analytic tools, project farmers can anticipate market demand.</span>
+                            <span>C. Cloud platforms allow processors to predict demand for following seasons.</span>
+                            <span>D. The digital trail would stop after the project partners have gathered harvest.</span>
+                        </div>
+                    </li>
+                    <li><b>Question 13.</b> Which paragraph mentions real-time tracking of produce?
+                        <div class="options-grid"><span>A. Paragraph 1</span><span>B. Paragraph 4</span><span>C. Paragraph 2</span><span>D. Paragraph 3</span></div>
+                    </li>
+                    <li><b>Question 14.</b> Which paragraph mentions a preventive measure against biological threats?
+                        <div class="options-grid"><span>A. Paragraph 1</span><span>B. Paragraph 4</span><span>C. Paragraph 2</span><span>D. Paragraph 3</span></div>
+                    </li>
+                </ul>
+
+                <hr style="border: 0; border-top: 1px dashed var(--border-color); margin: 30px 0;">
+
+                <i><b>Mark the letter A, B, C or D to indicate the best arrangement of utterances or sentences to make a cohesive and coherent exchange or text from 15 to 19.</b></i>
+                <ul class="exam-question-list" style="list-style-type: none;">
+                    <li><b>Question 15.</b> 
+                        <div style="font-size: 15px; margin: 10px 0;">a. This occasion, as a result, has made me more grateful to farmers...<br>b. It had, in fact, never occurred to me that farming would be so physically demanding.<br>c. I had to do the land ploughing, fertiliser spreading and grass uprooting in the burning summer heat.<br>d. Having hands-on experience on a farm for a fortnight really exhausted me...<br>e. Farming was such hard work that it made me sweat all the time...</div>
+                        <div class="options-grid"><span>A. d-e-b-a-c</span><span>B. d-b-c-e-a</span><span>C. e-a-d-c-b</span><span>D. e-c-a-b-d</span></div>
+                    </li>
+                    <li><b>Question 16.</b>
+                        <div style="font-size: 15px; margin: 10px 0;">a. Susan: I exercise regularly by jogging... How about you?<br>b. Susan: That sounds great! I think daily exercise and a healthy diet are the key...<br>c. Louis: I do yoga at home every day, and I follow a low-fat diet.<br>d. Louis: You look awesome. What do you do to keep fit?<br>e. Louis: Absolutely! Physical well-being is essential for a happy life.</div>
+                        <div class="options-grid"><span>A. e-a-d-b-c</span><span>B. c-b-e-a-d</span><span>C. d-a-c-b-e</span><span>D. c-a-d-b-e</span></div>
+                    </li>
+                    <li><b>Question 17.</b>
+                        <div style="font-size: 15px; margin: 10px 0;">a. Marvelli has now become a more dynamic and prosperous city...<br>b. These vital improvements have notably boosted Marvelli's economy...<br>c. To accommodate this growth, city planners have replaced the older terraced housing with modern high-rise buildings...<br>d. Recognising the increasing traffic congestion, the city council has had the main roads widened...<br>e. Over the past decade, the city of Marvelli has undergone a considerable transformation...</div>
+                        <div class="options-grid"><span>A. a-b-d-e-c</span><span>B. e-d-c-a-b</span><span>C. a-d-b-c-e</span><span>D. e-c-d-b-a</span></div>
+                    </li>
+                    <li><b>Question 18.</b> 
+                        <div style="font-size: 15px; margin: 10px 0;">a. Mary: Thank you very much for your help!<br>b. John: Well, keep straight on to the roundabout, then take the second exit on the left...<br>c. Mary: Excuse me, could you show me the way to the public library?</div>
+                        <div class="options-grid"><span>A. c-a-b</span><span>B. a-c-b</span><span>C. c-b-a</span><span>D. a-b-c</span></div>
+                    </li>
+                    <li><b>Question 19.</b> Dear Mr Smith,
+                        <div style="font-size: 15px; margin: 10px 0;">a. In case you have not received your chip-based card, contact our Customer Service...<br>b. This will automatically deactivate your magnetic stripe card...<br>c. Your current magnetic stripe card expires on August 31st...<br>d. Should you have received the chip-based credit card, please use it instantly.<br>e. We would like to inform you that due to our operating system conversion, your magnetic stripe credit card has been replaced...</div>
+                        <div class="options-grid"><span>A. e-a-b-d-c</span><span>B. c-e-d-a-b</span><span>C. e-d-b-c-a</span><span>D. c-e-a-b-d</span></div>
+                    </li>
+                </ul>
+
+                <hr style="border: 0; border-top: 1px dashed var(--border-color); margin: 30px 0;">
+
+                <i><b>Read the passage and mark the letter A, B, C or D to indicate the best answer to each of the following questions from 20 to 29.</b></i>
+                <div class="exam-passage">
+                    We are living through a boom in greenwashing – the strategic use of comforting environmental claims to disguise business-as-usual pollution. Picture a chief executive whose company emits millions of tonnes of CO2. Genuine decarbonisation would require bruising boardroom discussions, huge capital outlays, and a complete redesign of the firm's model. Far easier is to hire a creative agency to plaster products with labels such as "carbon-neutral" or "net-zero", calming critics, investors, and even eco-conscious children while emissions continue unsolved.<br><br>
+                    This tactic meets consumers at every turn. Airline websites promise guilt-free flights, petrol pumps boast zero-impact fuel, and even supermarket bacon is marketed as net-zero. [I] Advertising trickery is ancient, yet today's greenwashing has flourished only recently. The expression surfaced in the 1980s... Faced with mounting scrutiny, many boards prefer <b>glossy</b> PR to structural reform. Such corporate sleight of hand has become so pervasive that regulators in Europe and the United States are scrambling to tighten rules...<br><br>
+                    [II] The fossil-fuel sector exemplifies the issue. After decades covertly sowing doubt about climate science, oil and gas giants have grasped that direct denial is reputationally toxic. <b>They</b> have therefore swapped their denial tactics for a "green" paint-sprayer...<br><br>
+                    Why does this matter? Greenwashing and climate denial share a core objective: to postpone the emission cuts urgently required to avert climate breakdown. [III] Whereas denial invites opposition, greenwashing lulls the public into believing problems are already solved. Under this collective illusion, pressure on high-emitting firms evaporates... [IV] Greenwashing thus acts as a soothing lullaby, leading society toward ecological ruin... <u>Exposing this deception is essential if clichés are to be replaced by real, measurable emission cuts.</u>
+                </div>
+                <ul class="exam-question-list" style="list-style-type: none;">
+                    <li><b>Question 20.</b> According to paragraph 1, genuine decarbonisation ______.
+                        <div class="options-grid full-width"><span>A. is overlooked by corporations</span><span>B. involves hiring an expert agency</span><span>C. is costly and demanding</span><span>D. physically injures those involved</span></div>
+                    </li>
+                    <li><b>Question 21.</b> Which of the following best summarises paragraph 1?
+                        <div class="options-grid full-width"><span>A. The exponential growth of greenwashing is attributable to environmental benefits.</span><span>B. Large-emission enterprises prefer "net-zero" tags over genuine decarbonisation.</span><span>C. Chief executives' opinions are divided.</span><span>D. The great pressure to soothe environmental claims urges corporations to adopt greenwashing.</span></div>
+                    </li>
+                    <li><b>Question 22.</b> Which of the following is NOT stated as an example of greenwashed products?
+                        <div class="options-grid"><span>A. net-zero bacon</span><span>B. non-degradable electronics</span><span>C. guilt-free flights</span><span>D. zero-impact fuel</span></div>
+                    </li>
+                    <li><b>Question 23.</b> The word <b>glossy</b> in paragraph 2 mostly means ______.
+                        <div class="options-grid"><span>A. appealing but superficial</span><span>B. expensive but essential</span><span>C. confusing but engaging</span><span>D. costly but ineffective</span></div>
+                    </li>
+                    <li><b>Question 24.</b> The word <b>They</b> in paragraph 2 refers to ______.
+                        <div class="options-grid"><span>A. oil and gas giants</span><span>B. the United States</span><span>C. regulators in Europe</span><span>D. rules on environmental claims</span></div>
+                    </li>
+                    <li><b>Question 25.</b> Which of the following best paraphrases the underlined sentence in paragraph 3?
+                        <div class="options-grid full-width"><span>A. Were it not for genuine efforts...</span><span>B. Genuine efforts to reduce emissions cannot take the place of rhetoric without greenwashing being uncovered.</span><span>C. Not until genuine efforts are recognised could the truth be concealed.</span><span>D. No sooner had empty resolutions minimised emissions than the plain truth was elucidated.</span></div>
+                    </li>
+                    <li><b>Question 26.</b> According to the passage, the adoption of "green" paint by fossil-fuel companies is mentioned as ______.
+                        <div class="options-grid full-width"><span>A. a particular way to dispute claims</span><span>B. a typical application of climate science</span><span>C. a prompt response to public demand</span><span>D. a specific example of greenwashing</span></div>
+                    </li>
+                    <li><b>Question 27.</b> Which of the following can be inferred from the passage?
+                        <div class="options-grid full-width"><span>A. The profits that high-emitting firms reap from green marketing provide them with resources to reinvest.</span><span>B. The perceived action created by greenwashing has stressed the urgency for meaningful regulatory changes.</span><span>C. Regulators have the necessary tools and resources to verify most environmental claims.</span><span>D. Increased public concern about environmental issues contributes to the rise of greenwashing.</span></div>
+                    </li>
+                    <li><b>Question 28.</b> Where in the passage does the following sentence best fit?<br><i>"Yet greenwashing is arguably more insidious."</i>
+                        <div class="options-grid"><span>A. [I]</span><span>B. [II]</span><span>C. [III]</span><span>D. [IV]</span></div>
+                    </li>
+                    <li><b>Question 29.</b> Which of the following best summarises the passage?
+                        <div class="options-grid full-width"><span>A. Greenwashing has now been pervading everyday products...</span><span>B. Major emitters have opted for open climate denials...</span><span>C. A new wave of greenwashing allows corporations to hide ongoing pollution...</span><span>D. Greenwashing has significantly grown in its scale...</span></div>
+                    </li>
+                </ul>
+
+                <hr style="border: 0; border-top: 1px dashed var(--border-color); margin: 30px 0;">
+
+                <i><b>Read the following passage and mark the letter A, B, C or D to indicate the option that best fits each of the numbered blanks from 30 to 34.</b></i>
+                <div class="exam-passage">
+                    All holidays involve some element of risk, whether in the form of illness, bad weather, being unable to get what we want if we delay booking, or <b>(30) _____</b>. We ask ourselves what risks we would run if we went there, if there is a high likelihood of their occurrence...<br><br>
+                    Some tourists, of course, relish a degree of risk, as this gives an edge of excitement to the holiday, <b>(31) _____</b>. Others, however, are risk averse and will studiously avoid risk wherever possible. Clearly, the significance of the risk will be a key factor. <b>(32) _____</b>. The risk averse will book early, choose to return to the same resort and hotel they have visited, knowing its reliability, or book a package tour rather than travel independently.<br><br>
+                    <b>(33) _____</b>. There is evidence that much of the continuing reluctance shown by some tourists to seek information and make bookings through Internet providers can be attributed to, in part, the lack of face-to-face contact with a trusted – and, hopefully, expert – travel agent and, in part, <b>(34) _____</b> in favour of the information provider.
+                </div>
+                <ul class="exam-question-list" style="list-style-type: none;">
+                    <li><b>Question 30.</b> <div class="options-grid full-width"><span>A. what are the products we will be certainly seeing directly</span><span>B. until we certainly see its products directly</span><span>C. being uncertain about the product until seeing it directly</span><span>D. for a certain product to be seen directly</span></div></li>
+                    <li><b>Question 31.</b> <div class="options-grid full-width"><span>A. but do not present any risks and barriers to tourism itself</span><span>B. so the presence of risk is not in itself a barrier to tourism</span><span>C. and tourism itself does not present any barriers or risks</span><span>D. if the barrier of tourism itself is not in the presence of risk</span></div></li>
+                    <li><b>Question 32.</b> <div class="options-grid full-width"><span>A. People, by contrast, will be far less concerned about the risk of crime than about that of poor weather</span><span>B. As a result, there will be much less concern about the risk of poor weather than about the risk of crime</span><span>C. As earlier mentioned, the risk of crime will be of much greater concern to people than that of poor weather</span><span>D. Similarly, the concern about the risk of poor weather will be much greater than that about the risk of crime</span></div></li>
+                    <li><b>Question 33.</b> <div class="options-grid full-width"><span>A. Customers also book their holidays by choosing the methods without risky factors</span><span>B. Risk is also a factor in the methods chosen by customers to book their holidays</span><span>C. Holidays are also booked after customers choose factors and methods without risk</span><span>D. Also, the factors and methods customers choose to book their holidays are risky</span></div></li>
+                    <li><b>Question 34.</b> <div class="options-grid full-width"><span>A. the suspicion that information received through the Internet will be biased</span><span>B. thanks to the biased information received through the Internet with the suspicion</span><span>C. due to the Internet, through which biased and suspicious information is received</span><span>D. the biased information received through the Internet will be suspicious</span></div></li>
+                </ul>
+
+                <hr style="border: 0; border-top: 1px dashed var(--border-color); margin: 30px 0;">
+
+                <i><b>Read the following leaflet and mark the letter A, B, C or D to indicate the option that best fits each of the numbered blanks from 35 to 40.</b></i>
+                <div class="exam-passage" style="text-align: center;">
+                    <h4 style="margin-top: 0;">How to Live Your Life Actively?</h4>
+                    If you are not naturally sporty, and finding ways to fit more activity into your daily life, here are several tips to help you make a routine <b>(35) _____</b> being active:<br>
+                    <ul style="text-align: left; display: inline-block; max-width: 90%; margin-top: 15px;">
+                        <li>Select a realistic exercise plan.</li>
+                        <li>Track your progress using a health app <b>(36) _____</b> a paper checklist.</li>
+                        <li>Take every opportunity to do such strength-building activities as carrying <b>(37) _____</b> and climbing the stairs.</li>
+                        <li>Invite friends and <b>(38) _____</b> family members to join in, and try <b>(39) _____</b> everyone's competitive side.</li>
+                        <li>Reward yourself with a treat like a favourite TV show if your plan works <b>(40) _____</b> to maintain your motivation.</li>
+                    </ul>
+                </div>
+                <ul class="exam-question-list" style="list-style-type: none;">
+                    <li><b>Question 35.</b> <div class="options-grid"><span>A. in</span><span>B. to</span><span>C. at</span><span>D. of</span></div></li>
+                    <li><b>Question 36.</b> <div class="options-grid"><span>A. or</span><span>B. nor</span><span>C. so</span><span>D. but</span></div></li>
+                    <li><b>Question 37.</b> <div class="options-grid"><span>A. bags grocery heavy</span><span>B. heavy bags grocery</span><span>C. bags heavy grocery</span><span>D. heavy grocery bags</span></div></li>
+                    <li><b>Question 38.</b> <div class="options-grid"><span>A. other</span><span>B. the others</span><span>C. another</span><span>D. others</span></div></li>
+                    <li><b>Question 39.</b> <div class="options-grid"><span>A. comparing</span><span>B. contrasting</span><span>C. replacing</span><span>D. engaging</span></div></li>
+                    <li><b>Question 40.</b> <div class="options-grid"><span>A. wonders</span><span>B. legends</span><span>C. values</span><span>D. marvels</span></div></li>
+                </ul>
+            `;
+        }
+
+        function getTHPTEnglishAnswersHTML() {
+            return `
+                <div class="solution-box">
+                    <div class="barem-title">ĐÁP ÁN CHUẨN MÃ ĐỀ 1105</div>
+                    <table style="width: 100%; border-collapse: collapse; text-align: center; margin-top: 10px;">
+                        <tr><td>1. D</td><td>11. B</td><td>21. B</td><td>31. D</td></tr>
+                        <tr><td>2. B</td><td>12. B</td><td>22. B</td><td>32. B</td></tr>
+                        <tr><td>3. A</td><td>13. A</td><td>23. A</td><td>33. A</td></tr>
+                        <tr><td>4. D</td><td>14. B</td><td>24. A</td><td>34. B</td></tr>
+                        <tr><td>5. D</td><td>15. A</td><td>25. B</td><td>35. D</td></tr>
+                        <tr><td>6. A</td><td>16. C</td><td>26. D</td><td>36. A</td></tr>
+                        <tr><td>7. C</td><td>17. B</td><td>27. C</td><td>37. D</td></tr>
+                        <tr><td>8. C</td><td>18. C</td><td>28. C</td><td>38. A</td></tr>
+                        <tr><td>9. D</td><td>19. D</td><td>29. C</td><td>39. D</td></tr>
+                        <tr><td>10. C</td><td>20. B</td><td>30. C</td><td>40. A</td></tr>
+                    </table>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
